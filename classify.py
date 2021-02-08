@@ -117,10 +117,23 @@ def substitute(subs, pattern):
     Output: 
         eg. 'john gave (son-of mary) ?z
     """
+    pattern = pattern.split()
+    for s in subs:
+        i = 0
+        while i < len(pattern):
+            if pattern[i] == s[0]:
+                pattern[i] = s[1]
+            i += 1
+    
+    return pattern
+        
 
 def unify():
     """
     """
 
 if __name__ == "__main__":
-    print(RULES)
+    subs = [('?y', 'mary'), ('?x', 'john')] 
+    pattern = '?x gave son-of ?y ?z' 
+
+    print(substitute(subs,pattern))
