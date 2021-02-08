@@ -163,15 +163,69 @@ def unify(pattern1, pattern2, subs):
     
     return subs
 
+# def match_antecedent (anteceds, wm, sub):
+#     antec = anteceds[0]
 
+#     def ma_helper (states, wm_left):
+
+#         # If wm_left is empty return states.
+
+#         # Otherwise attempt to unify antec with next pattern in wm_left in the context of sub.
+
+#         #
+
+#         # If unification fails, call ma_helper on the same list of states and the rest of wm_left.
+
+#         #
+
+#         # If unification succeeds, call ma_helper with the new state combined onto states and
+
+#         # the rest of wm_left.
+
+#         # (The new state includes the remaining antecedents and whatever new substitution
+
+#         # resulted from the unification.)
+
+#     return ma_helper ([], wm)
+
+def execute(subs,patterns,wm):
+    """
+    Input:
+        subs: a list of substitutions
+        patterns: a list of patterns (RHS of the rules)
+        wm: working memory
+    Output:
+        an acuumulated list of new patterns derived from substitution
+    """
+    res = [] 
+
+    for p in patterns:
+        tmp = substitute(subs, p)
+        if tmp not in wm:
+            res.append(tmp)
+    
+    return res
+
+def update_wm(wm, updates):
+    for u in updates:
+        wm.append(u)
+    return wm
 
 
 if __name__ == "__main__":
     subs = []
+    wm = []
     pattern1 = "has-spine ?animal True"
     pattern2 = "has-spine dog True"
 
     subs = unify(pattern1,pattern2,subs)
-    print(subs)
+    print("subs = ", subs)
 
-    print(substitute(subs,pattern1))
+    updates = execute(subs,RULES[2][2], wm)
+    wm = update_wm(wm, updates)
+    print("wm = ",wm)
+
+    updates = execute(subs,RULES[2][2], wm)
+    print("updates = ", updates)
+    wm = update_wm(wm, updates)
+    print("wm = ",wm)
