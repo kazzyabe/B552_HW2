@@ -125,15 +125,53 @@ def substitute(subs, pattern):
                 pattern[i] = s[1]
             i += 1
     
-    return pattern
+    return " ".join(pattern)
         
+def is_var (string):
+    """check if the string is a variable"""
+    if (string[0] == '?'):
+        return True
+    return False
 
-def unify():
+def unify(pattern1, pattern2, subs):
     """
+    Input:
+        two patterns and a substitution 
+    Output:
+        an updated substitution (possibly the empty list) or False.
     """
+    pattern1 = pattern1.split()
+    pattern2 = pattern2.split()
+
+    var = [] # a list for recording variable positions
+    matching = True # a flag for checking if the two patterns matching
+
+    if len(pattern1) == len(pattern2):
+        for i in range(len(pattern1)):
+            if is_var(pattern1[i]) or is_var(pattern2[i]):
+                var.append(i)
+            else:
+                if pattern1[i] != pattern2[i]:
+                    matching = False
+        
+        if matching:
+            for i in var:
+                if is_var(pattern1[i]) and (not is_var(pattern2[i])):
+                    subs.append((pattern1[i],pattern2[i]))
+                elif is_var(pattern2[i]) and (not is_var(pattern1[i])):
+                    subs.append((pattern2[i],pattern1[i]))
+    
+    return subs
+
+
+
 
 if __name__ == "__main__":
-    subs = [('?y', 'mary'), ('?x', 'john')] 
-    pattern = '?x gave son-of ?y ?z' 
+    subs = []
+    pattern1 = "has-spine ?animal True"
+    pattern2 = "has-spine dog True"
 
-    print(substitute(subs,pattern))
+    subs = unify(pattern1,pattern2,subs)
+    print(subs)
+
+    print(substitute(subs,pattern1))
