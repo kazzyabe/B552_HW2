@@ -1,7 +1,7 @@
 RULES = [
     (#1 If has spine, vertebrate. Necessary?:"is-invertebrate ?animal False"
-        "has-spine-implies-vertebrate", 
-        ["has-spine ?animal True"], 
+        "has-spine-implies-vertebrate",
+        ["has-spine ?animal True"],
         ["is-vertebrate ?animal True"]
     ),
     (#2 If has no spine, not vertebrate. (invertebrate) Necessary?:"is-invertebrate ?animal True"
@@ -71,8 +71,8 @@ RULES = [
     (#12 if vertebrate, cold-blooded, gills, not lung, then fish
         "vertebrate-cold-blooded-gills-not-lung-imply-fish",
         [
-            "is-vertebrate ?animal True", 
-            "is-warm-blooded ?animal False", 
+            "is-vertebrate ?animal True",
+            "is-warm-blooded ?animal False",
             "gill-breathing ?animal True",
             "lung-breathing ?animal False"
         ],
@@ -81,8 +81,8 @@ RULES = [
     (#12 if vertebrate, cold-blooded, not gills, lung, then reptile
         "vertebrate-cold-blooded-not-gills-lung-imply-reptile",
         [
-            "is-vertebrate ?animal True", 
-            "is-warm-blooded ?animal False", 
+            "is-vertebrate ?animal True",
+            "is-warm-blooded ?animal False",
             "gill-breathing ?animal False",
             "lung-breathing ?animal True"
         ],
@@ -91,8 +91,8 @@ RULES = [
     (#12 if vertebrate, cold-blooded, gills, lung, skin, then amphibian
         "vertebrate-cold-blooded-gills-lung-imply-reptile",
         [
-            "is-vertebrate ?animal True", 
-            "is-warm-blooded ?animal False", 
+            "is-vertebrate ?animal True",
+            "is-warm-blooded ?animal False",
             "gill-breathing ?animal True",
             "lung-breathing ?animal True"
         ],
@@ -109,12 +109,12 @@ def run_ps(wm, rules):
 
 def substitute(subs, pattern):
     """
-    Input 
-        substitution: 
-            eg. [('?y', 'mary'), ('?x', 'john')] 
-        pattern: 
-            eg. '?x gave (son-of ?y) ?z' 
-    Output: 
+    Input
+        substitution:
+            eg. [('?y', 'mary'), ('?x', 'john')]
+        pattern:
+            eg. '?x gave (son-of ?y) ?z'
+    Output:
         eg. 'john gave (son-of mary) ?z
     """
     pattern = pattern.split()
@@ -124,16 +124,16 @@ def substitute(subs, pattern):
             if pattern[i] == s[0]:
                 pattern[i] = s[1]
             i += 1
-    
-    return pattern
-        
 
-def unify():
+    return pattern
+
+
+def unify(pattern, pattern, subs):
     """
     """
 
 if __name__ == "__main__":
-    subs = [('?y', 'mary'), ('?x', 'john')] 
-    pattern = '?x gave son-of ?y ?z' 
+    subs = [('?y', 'mary'), ('?x', 'john')]
+    pattern = '?x gave son-of ?y ?z'
 
     print(substitute(subs,pattern))
