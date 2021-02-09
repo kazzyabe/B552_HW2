@@ -128,9 +128,10 @@ def substitute(subs, pattern):
     return pattern
 
 
-def unify(pattern, pattern, subs):
+def unify(pattern1, pattern2, subs):
     """
     """
+    pass
 
 if __name__ == "__main__":
     subs = [('?y', 'mary'), ('?x', 'john')]
