@@ -19,7 +19,7 @@ RULES = [
     (#4 if cannnot control body temp, not warm blooded (cold blooded)
         "cannot-control-body-tmp-implies-cold-blooded",
         ["can-control-body-temp ?animal False"],
-        ["is-warm-blooded ?animal False"
+        ["is-warm-blooded ?animal False",
             "is-bird ?animal False", "is-mammal ?animal False",
         ]
     ),
