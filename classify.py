@@ -38,37 +38,37 @@ RULES = [
         ["breath-through-gill ?animal True"],
         ["gill-breathing ?animal True"]
     ),
-    (#7b if not breath throughout gills at some point in a life, gill-breathing false
+    (#8 if not breath throughout gills at some point in a life, gill-breathing false
         "not-breath-through-gill-implies-gill-breathing",
         ["breath-through-gill ?animal False"],
         ["gill-breathing ?animal False"]
     ),
-    (#8 if breath throughout lungs at some point in a life, lung-breathing
+    (#9 if breath throughout lungs at some point in a life, lung-breathing
         "breath-through-lung-implies-lung-breathing",
         ["breath-through-lung ?animal True"],
         ["lung-breathing ?animal True"]
     ),
-    (#8b if not breath throughout lungs at some point in a life, lung-breathing false
+    (#10 if not breath throughout lungs at some point in a life, lung-breathing false
         "not-breath-through-lung-implies-lung-breathing",
         ["breath-through-lung ?animal False"],
         ["lung-breathing ?animal False"]
     ),
-    (#9 if breath throughout skin at some point in a life, skin-breathing
+    (#11 if breath throughout skin at some point in a life, skin-breathing
         "breath-through-skin-implies-skin-breathing",
         ["breath-through-skin ?animal True"],
         ["skin-breathing ?animal True"]
     ),
-    (#10 if vertebrate, warm-blooded, viviparous (not oviparous), then mammals
+    (#12 if vertebrate, warm-blooded, viviparous (not oviparous), then mammals
         "vertebrate-warm-blooded-viviparous-imply-mammal",
         ["is-vertebrate ?animal True", "is-warm-blooded ?animal True", "is-oviparous ?animal False"],
         ["is-mammal ?animal True"]
     ),
-    (#11 if vertebrate, warm-blooded, oviparous, then bird
+    (#13 if vertebrate, warm-blooded, oviparous, then bird
         "vertebrate-warm-blooded-oviparous-imply-bird",
         ["is-vertebrate ?animal True", "is-warm-blooded ?animal True", "is-oviparous ?animal True"],
         ["is-bird ?animal True"]
     ),
-    (#12 if vertebrate, cold-blooded, gills, not lung, then fish
+    (#14 if vertebrate, cold-blooded, gills, not lung, then fish
         "vertebrate-cold-blooded-gills-not-lung-imply-fish",
         [
             "is-vertebrate ?animal True", 
@@ -78,7 +78,7 @@ RULES = [
         ],
         ["is-fish ?animal True"]
     ),
-    (#12 if vertebrate, cold-blooded, not gills, lung, then reptile
+    (#15 if vertebrate, cold-blooded, not gills, lung, then reptile
         "vertebrate-cold-blooded-not-gills-lung-imply-reptile",
         [
             "is-vertebrate ?animal True", 
@@ -88,7 +88,7 @@ RULES = [
         ],
         ["is-reptile ?animal True"]
     ),
-    (#12 if vertebrate, cold-blooded, gills, lung, skin, then amphibian
+    (#16 if vertebrate, cold-blooded, gills, lung, skin, then amphibian
         "vertebrate-cold-blooded-gills-lung-imply-reptile",
         [
             "is-vertebrate ?animal True", 
@@ -99,13 +99,6 @@ RULES = [
         ["is-amphibian ?animal True"]
     )
 ]
-
-def run_ps(wm, rules):
-    """
-    Input:
-        wm: working memory
-        rules: a list of rules
-    """
 
 def substitute(subs, pattern):
     """
@@ -203,11 +196,7 @@ def match_antecedent(anteceds, wm, sub):
             if possible_subs == False: # If unification fails, call ma_helper on the same list of states and the rest of wm_left.
                 ma_helper(states, wm_left[1:])
             else: # If unification succeeds, call ma_helper with the new state combined onto states and the rest of wm_left.
-                for s in possible_subs: # update sub
-                    if s not in sub:
-                        sub.append(s)
-                
-                new_state = substitute(sub, antec) #(The new state includes the remaining antecedents and whatever new substitution resulted from the unification.)
+                new_state = (anteceds[1:], possible_subs) #(The new state includes the remaining antecedents and whatever new substitution resulted from the unification.)
                 states.append(new_state)
 
                 # to take care of len(wm_left) == 1
@@ -242,7 +231,10 @@ def update_wm(wm, updates):
     return wm
 
 # def match_rule (name, lhs, rhs, wm):
-#       #print some useful messages here
+#       print("------------ matching rule ", name, "--------------")
+#       print("lhs = ", lhs)
+#       print("rhs = ", rhs)
+#       print("wm = ", wm)
 #       def mr_helper (queue, new_wm):
 #            # Each state in queue is
 #            # (anteceds-left, subs)
@@ -284,15 +276,34 @@ def update_wm(wm, updates):
 
 #                         #            by "match_antecedent" replacing state1
 
-#     return mr_helper (match_antecedent (lhs, wm ,[]), [])
+#     return mr_helper(match_antecedent(lhs, wm ,[]), [])
 
+def match_rules(rules, wm):
+    res = []
+    for r in rules:
+        new_patterns = match_rule(r[0],r[1],r[2], wm)
+        for n in new_patterns:
+            if n not in res:
+                res.append(n)
+    return res
+
+def run_ps(wm, rules, qmode=False):
+    """
+    Input:
+        wm: working memory
+        rules: a list of rules
+    """
+    new_patterns = match_rules(rules, wm)
+    while new_patterns != []:
+        new_patterns = match_rules(rules, wm)
+    return wm
 
 
 if __name__ == "__main__":
     subs = []
-    wm = ["has-spine dog True"]
+    wm = ["is-vertebrate dog True"]
 
-    anteceds = RULES[0][1]
+    anteceds = RULES[-1][1]
     print("anteceds = ", anteceds)
     matched = match_antecedent(anteceds, wm, subs)
     print("matched = ", matched)
