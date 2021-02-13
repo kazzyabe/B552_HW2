@@ -94,7 +94,7 @@ def match_antecedent(anteceds, wm, sub):
             print("        end case: ", states)
             return states
         else: # Otherwise attempt to unify antec with next pattern in wm_left in the context of sub.
-            wm_head = wm[0]
+            wm_head = wm_left[0]
             possible_subs = unify(antec,wm_head, sub)
             print("        Checking ", antec, " and ", wm_head, " with sub ", sub)
             print("        possible_sub = ", possible_subs)
@@ -107,7 +107,7 @@ def match_antecedent(anteceds, wm, sub):
                     states.append(new_state)
 
                 # to take care of len(wm_left) == 1
-                if len(wm_left) > 2:
+                if len(wm_left) > 1:
                     wm_left = wm_left[1:]
                 else:
                     wm_left = []
@@ -164,13 +164,14 @@ def match_rule(name, lhs, rhs, wm):
                 new_wm = update_wm(new_wm, derived)
                 return mr_helper(queue[1:], new_wm)
             elif state1[0] != []: # Else if state1 has antecedents, apply "match_antecedent" to them along with wm and the substitutions in state1.
-                matched = match_antecedent(state1[0], new_wm, state1[1])
+                matched = match_antecedent(state1[0], wm, state1[1])
                 if matched == []: # If "match_antecedent" returns no new states, return mr_helper on rest of the queue without changing states.
                     return mr_helper(queue[1:], new_wm)
                 else:
                     # Else return mr_helper on the updated queue,
                     # i.e., the old one with the new states found
                     # by "match_antecedent" replacing state1
+                    queue = matched + queue[1:]
                     return mr_helper(queue, new_wm)
     return mr_helper(match_antecedent(lhs, wm ,[]), [])
 
@@ -187,7 +188,7 @@ def match_rules(rules, wm):
         # break
     return res
 
-def run_ps(wm, rules, qmode=False):
+def run_ps(wm, rules):
     """
     Input:
         wm: working memory
@@ -316,14 +317,24 @@ RULES = [
 
 if __name__ == "__main__":
     # testing all
-    # subs = []
-    # wm = ["has-spine dog True","can-control-body-temp dog True","breath-through-lung ?animal True"]
-    # wm = run_ps(wm, RULES)
+    wm = ["has-spine dog True","can-control-body-temp dog True","breath-through-lung dog True", "born-from-egg dog False"]
+    wm = run_ps(wm, RULES)
+    print("----------- Result -----------")
+    print("    wm = ", wm)
 
     ###### partial tests
-    lhs =  ['can-control-body-temp ?animal True']
-    rhs =  ['is-warm-blooded ?animal True', 'is-amphibian ?animal False', 'is-fish ?animal False', 'is-reptile ?animal False']
-    wm =  ['has-spine dog True', 'can-control-body-temp dog True', 'breath-through-lung ?animal True']
+    # name = "can-control-body-temp-implies-warm-blooded"
+    # lhs =  ['can-control-body-temp ?animal True']
+    # rhs =  ['is-warm-blooded ?animal True', 'is-amphibian ?animal False', 'is-fish ?animal False', 'is-reptile ?animal False']
+    # wm =  ['has-spine dog True', 'can-control-body-temp dog True', 'breath-through-lung ?animal True']
+    # new_patterns = match_rule(name,lhs,rhs, wm)
+
+    # name = "vertebrate-warm-blooded-viviparous-imply-mammal"
+    # lhs =  ['is-vertebrate ?animal True', 'is-warm-blooded ?animal True', 'is-oviparous ?animal False']
+    # rhs =  ['is-mammal ?animal True']
+    # wm =  ['has-spine dog True', 'can-control-body-temp dog True', 'breath-through-lung dog True', 'born-from-egg dog False', 'is-vertebrate dog True', 'is-warm-blooded dog True', 'is-amphibian dog False', 'is-fish dog False', 'is-reptile dog False', 'is-oviparous dog False', 'lung-breathing dog True']
+    # new_patterns = match_rule(name,lhs,rhs, wm)
+
 
     # anteceds = RULES[-1][1]
     # print("anteceds = ", anteceds)
