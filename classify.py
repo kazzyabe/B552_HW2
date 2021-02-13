@@ -1,3 +1,10 @@
+"""
+How to Run:
+    python classify.py
+
+if you want to change the initial working memory, go to the line 365.
+"""
+
 def substitute(subs, pattern):
     """
     Input 
@@ -74,6 +81,7 @@ def unify(pattern1, pattern2, subs):
 
 def match_antecedent(anteceds, wm, sub):
     """
+    match an antecedent and knowledge in the working memory
     Input:
         anteceds: a list of antecedents still to be matched
         wm: a working memory
@@ -83,21 +91,21 @@ def match_antecedent(anteceds, wm, sub):
     
     * uses unify() to attempt to match the antecedent against each pattern in the wm
     """
-    print("-------- Matching Antecedent --------------")
+    # print("-------- Matching Antecedent --------------")
     antec = anteceds[0]
 
     def ma_helper(states, wm_left):
-        print("    ---------- ma_helper --------")
+        # print("    ---------- ma_helper --------")
         # print("states = ", states)
         # print("sub = ", sub)
         if wm_left == []: # If wm_left is empty return states.
-            print("        end case: ", states)
+            # print("        end case: ", states)
             return states
         else: # Otherwise attempt to unify antec with next pattern in wm_left in the context of sub.
             wm_head = wm_left[0]
             possible_subs = unify(antec,wm_head, sub)
-            print("        Checking ", antec, " and ", wm_head, " with sub ", sub)
-            print("        possible_sub = ", possible_subs)
+            # print("        Checking ", antec, " and ", wm_head, " with sub ", sub)
+            # print("        possible_sub = ", possible_subs)
 
             if possible_subs == False: # If unification fails, call ma_helper on the same list of states and the rest of wm_left.
                 return ma_helper(states, wm_left[1:])
@@ -116,6 +124,8 @@ def match_antecedent(anteceds, wm, sub):
 
 def execute(subs,patterns,wm):
     """
+    substitute the variables in patterns
+
     Input:
         subs: a list of substitutions
         patterns: a list of patterns (RHS of the rules)
@@ -139,18 +149,29 @@ def update_wm(wm, updates):
     return wm
 
 def match_rule(name, lhs, rhs, wm):
-    print("------------ Matching Rule '", name, "' --------------")
-    print("    lhs = ", lhs)
-    print("    rhs = ", rhs)
-    print("    wm = ", wm)
+    """
+    match a given rule
+
+    Input: 
+        name: the name of a rule
+        lhs: the left hand side of the rule
+        rhs: the right hand side of the rule
+        wm: working memory
+    Output:
+        new_wm: new working memory
+    """
+    print("        ------------ Matching Rule '", name, "' --------------")
+    print("            lhs = ", lhs)
+    print("            rhs = ", rhs)
+    print("            wm = ", wm)
     print()
     def mr_helper(queue, new_wm):
         # Each state in queue is
             # (anteceds-left, subs)
-        print("    ----- matching rule helper ------")
-        print("        queue = ", queue)
-        print("        new_wm = ", new_wm)
-        print()
+        # print("    ----- matching rule helper ------")
+        # print("        queue = ", queue)
+        # print("        new_wm = ", new_wm)
+        # print()
         if queue == []: # if the queue is empty, return new_wm
             return new_wm
         else: # else examine the first item in the queue (call it state1)
@@ -176,38 +197,62 @@ def match_rule(name, lhs, rhs, wm):
     return mr_helper(match_antecedent(lhs, wm ,[]), [])
 
 def match_rules(rules, wm):
+    """
+    Matches each rules and return new patterns derived from matching rules
+
+    Input:
+        rules: a list of rules
+        wm: working memory
+    Output:
+        a list of drived patterns
+    """
     res = []
     for r in rules:
         new_patterns = match_rule(r[0],r[1],r[2], wm)
+        if new_patterns:
+            print("            Match succeeds")
+            print("            Adding assertions to WM")
+        else:
+            print("            Match fails")
         for n in new_patterns:
             if (n not in wm) and (n not in res):
+                print("                ",n)
                 res.append(n)
-        print("new patterns so far = ", res)
-        print()
+        # print("new patterns so far = ", res)
+        # print()
         # for testing
         # break
     return res
 
 def run_ps(wm, rules):
     """
+    Derive new assertions until it cannot derive new ones anymore 
+
     Input:
         wm: working memory
         rules: a list of rules
+    Output:
+        wm
     """
     i = 1
-    print("------------ Cycle ", i, " --------------------")
+    print("-------------------------------- Cycle ", i, " ----------------------------------")
+    print("    current working memory: ", wm)
+    print("    -------- Matching Rules --------")
     new_patterns = match_rules(rules, wm)
-    print("    new_patterns = ", new_patterns)
+    # print("    new_patterns = ", new_patterns)
     wm = update_wm(wm, new_patterns)
     print("    updated wm = ", wm)
     i += 1
     while new_patterns != []:
-        print("------------ Cycle ", i, " --------------------")
+        print("-------------------------------- Cycle ", i, " ----------------------------------")
+        print("    current working memory: ", wm)
+        print("    -------- Matching Rules --------")
         new_patterns = match_rules(rules, wm)
-        print("    new_patterns = ", new_patterns)
+        # print("    new_patterns = ", new_patterns)
         wm = update_wm(wm, new_patterns)
+        print("")
         print("    updated wm = ", wm)
-        print()
+        print("")
         # if i == 3:
         #     break
         i += 1
